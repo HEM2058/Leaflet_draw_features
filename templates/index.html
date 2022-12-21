@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Feature</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="{% static '/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css"/>
+</head>
+<body onload="myFunction()">
+    <div id="map">
+       
+     <div class="leaflet-control" id="saveok">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-save-fill" viewBox="0 0 16 16">
+            <path d="M8.5 1.5A1.5 1.5 0 0 1 10 0h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6c-.314.418-.5.937-.5 1.5v7.793L4.854 6.646a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l3.5-3.5a.5.5 0 0 0-.708-.708L8.5 9.293V1.5z"/>
+          </svg>
+     </div>
+    </div>
+    <div class="leaflet-control" id="downdiv" >
+        <a id="down">Download geoJSON File</a>
+       </div>
+
+    
+</body>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script src="{% static '/main.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js"></script>
+<script>
+    //leaflet draw plugin
+
+
+var drawnFeatures = new L.FeatureGroup();
+map.addLayer(drawnFeatures);
+
+var drawControl = new L.Control.Draw({
+    edit: {
+        featureGroup:drawnFeatures,
+        remove:false
+    }
+});
+map.addControl(drawControl);
+
+ array = Array()
+map.on("draw:created", function(e){
+    console.log(e)
+    var layerType = e.layerType;
+    var layer = e.layer;
+    JSON.stringify(layer.toGeoJSON)
+    layer.bindPopup(`<p>${JSON.stringify(layer.toGeoJSON())}</p>`)
+    const star = JSON.stringify(layer.toGeoJSON())
+    array.push(star)
+    console.log(array)
+    drawnFeatures.addLayer(layer);
+    return array;
+   
+ 
+})
+
+$('#saveok').on('click',function(){
+    console.log(array)
+    for (let i = 0; i < array.length; i++)
+  {
+    // const  str = [];
+
+    // str[i] = JSON.stringify(array[i].toGeoJSON())
+    localStorage.setItem('product', array[i])
+    console.log(array[i]);
+
+  }
+     
+    
+    // let name = "latest value"
+    // localStorage.setItem(name,array);
+    // console.log(localStorage.getItem(array))
+  
+})
+function myFunction() {
+  alert("Do you want to recover previous draw ?");
+   const strj = localStorage.getItem('product')
+    const st = JSON.parse(strj)
+    console.log(st)
+    
+}  
+    const down = document.getElementById("down");
+    const blob1 = new Blob(array,{type:"application/json"})
+    down.href = URL.createObjectURL(blob1);
+     
+
+    
+</script>
+</html>
